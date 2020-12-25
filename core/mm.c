@@ -151,6 +151,7 @@ static void dump_memory_info(void)
 		"VM",
 		"DTB",
 		"Kernel",
+		"RamDisk",
 		"Unknown"
 	};
 
@@ -175,14 +176,23 @@ static void map_os_memory(void)
 
 	list_for_each_entry(region, &mem_list, list) {
 		type = memory_region_type(region);
+		 /*
+		  * Map the memory in VM region, because we may touch the
+		  * kernel and fdt.
+		  */
 		if ((type != MEMORY_REGION_TYPE_NORMAL) &&
-				(type != MEMORY_REGION_TYPE_DMA))
+		    (type != MEMORY_REGION_TYPE_DMA) &&
+		    (type != MEMORY_REGION_TYPE_VM) &&
+		    (type != MEMORY_REGION_TYPE_RAMDISK));
 			continue;
 
 		if (type == MEMORY_REGION_TYPE_DMA)
 			flags |= VM_IO;
 		else
 			flags |= VM_NORMAL;
+
+		if (type == MEMORY_REGION_TYPE_RAMDISK)
+			flags |= VM_RO;
 
 		create_host_mapping(region->vir_base, region->phy_base,
 				region->size, flags);

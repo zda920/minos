@@ -20,6 +20,7 @@
 #include <minos/of.h>
 #include <minos/irq.h>
 #include <minos/bootarg.h>
+#include <minos/ramdisk.h>
 
 #define OF_MAX_DEEPTH	5
 
